@@ -7,11 +7,22 @@ if(CMAKE_COMPILE_GCOV)
   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
 endif()
 
-if (KDE4_BUILD_TESTS)
-  add_subdirectory( tests )
-else()
+option(BUILD_TOOLS "Build and install tools for development and testing purposes." TRUE)
+
+if(KDE4_BUILD_TESTS)
+  set(BUILD_TOOLS TRUE)
+endif()
+
+if (BUILD_TOOLS)
+# add testrunner (application for managing a self-contained test environment)
   add_subdirectory( tests/testrunner )
   add_subdirectory( tests/testresource )
+  add_subdirectory( tests/testsearchplugin )
+  add_subdirectory( tests/benchmarker )
+endif()
+
+if (KDE4_BUILD_TESTS)
+  add_subdirectory( tests )
 endif()
 
 add_definitions( ${AKONADI_DEFINITIONS} )

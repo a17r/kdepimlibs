@@ -26,16 +26,7 @@ include_directories(
   ${CMAKE_BINARY_DIR}/kmime
 )
 
-# add testrunner (application for managing a self-contained test
-# environment)
-
 add_subdirectory(etm_test_app)
-add_subdirectory(testrunner)
-add_subdirectory(testresource)
-add_subdirectory(testsearchplugin)
-
-# add benchmarker
-add_subdirectory(benchmarker)
 
 # convenience macro to add akonadi demo application
 macro(add_akonadi_demo _source)

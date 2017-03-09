@@ -2,7 +2,9 @@ if ( LIBXML2_FOUND )
   add_definitions( -DHAVE_LIBXML2 )
 endif ()
 
-add_subdirectory( tests )
+if (KDE4_BUILD_TESTS)
+  add_subdirectory( tests )
+endif()
 
 include_directories(
     ${KDE4_INCLUDES}
@@ -41,11 +43,13 @@ install(TARGETS akonadi-xml EXPORT kdepimlibsLibraryTargets ${INSTALL_TARGETS_DE
 install(FILES ${akonadixml_HDRS} DESTINATION ${INCLUDE_INSTALL_DIR}/akonadi/xml COMPONENT Devel)
 install(FILES akonadi-xml.xsd DESTINATION ${DATA_INSTALL_DIR}/akonadi/)
 
-kde4_add_executable(akonadi2xml akonadi2xml.cpp)
-target_link_libraries(akonadi2xml
-   akonadi-xml
-   ${KDE4_KDEUI_LIBS}
-   akonadi-kde
-)
+if(BUILD_TOOLS)
+  kde4_add_executable(akonadi2xml akonadi2xml.cpp)
+  target_link_libraries(akonadi2xml
+    akonadi-xml
+    ${KDE4_KDEUI_LIBS}
+    akonadi-kde
+  )
 
-install(TARGETS akonadi2xml ${INSTALL_TARGETS_DEFAULT_ARGS})
+  install(TARGETS akonadi2xml ${INSTALL_TARGETS_DEFAULT_ARGS})
+endif()
