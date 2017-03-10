@@ -6,8 +6,7 @@ set( _qgpgme_soversion 1 )
 
 if ( WIN32 AND GPGME_VANILLA_FOUND )
 
-   # on Windows, we require gpgme(-vanilla), which is thread-safe,
-   # and we don't provide gpgme-qt support
+   # on Windows, we require gpgme(-vanilla), which is thread-safe
 
    set( _any_gpgme_found true )
    set( _qgpgme_libgpgme gpgmepp )
@@ -15,14 +14,12 @@ if ( WIN32 AND GPGME_VANILLA_FOUND )
 
 endif()
 
-if ( NOT WIN32 AND GPGME_PTHREAD_FOUND )
+if ( NOT WIN32 AND GPGME_VANILLA_FOUND )
 
-   # on Unix, we requrie gpgme-pthread (for convenience, since vanilla
-   # gpgme isn't thread-aware, and we don't want to restrict clients
-   # of qgpgme to non-threaded useage of gpgme)
+   # on Unix, we require gpgme(-vanilla), which is thread-safe
 
    set( _any_gpgme_found true )
-   set( _qgpgme_libgpgme gpgmepp-pthread )
+   set( _qgpgme_libgpgme gpgmepp )
    set( _qgpgme_extra_src eventloopinteractor.cpp eventloopinteractor_unix.cpp )
    set( _qgpgme_extra_headers eventloopinteractor.h )
 

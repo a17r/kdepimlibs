@@ -1,9 +1,5 @@
-if ( WIN32 AND GPGME_VANILLA_FOUND )
+if ( GPGME_VANILLA_FOUND )
    set( _qgpgme_libgpgme gpgmepp )
-endif()
-
-if ( NOT WIN32 AND GPGME_PTHREAD_FOUND )
-   set( _qgpgme_libgpgme gpgmepp-pthread )
 endif()
 
 set( EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR} )

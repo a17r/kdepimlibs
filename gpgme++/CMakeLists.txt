@@ -10,9 +10,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${KDE4_ENABLE_EXCEPTIONS}")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config-gpgme++.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-gpgme++.h )
 
-## gpgme comes in three flavours on each of the platforms:
-##  Windows: gpgme, gpgme-glib, gpgme-qt
-##     Unix: gpgme, gpgme-pthread, gpgme-pth
+## gpgme comes in these flavours on each of the platforms:
+##  Windows: gpgme, gpgme-glib
+##     Unix: gpgme
 ## We're building corresponding gpgme++ flavours
 
 set(gpgme_LIB_SRCS
@@ -73,47 +73,6 @@ if ( GPGME_GLIB_FOUND )
    )
    set(GPGMEPP_GLIB_LIBRARY ${LIBRARY_OUTPUT_PATH}/libgpgmepp.so)
    install(TARGETS gpgmepp-glib EXPORT kdepimlibsLibraryTargets ${INSTALL_TARGETS_DEFAULT_ARGS} )
-endif()
-
-
-if ( GPGME_QT_FOUND )
-   add_library( gpgmepp-qt ${LIBRARY_TYPE} ${gpgme_LIB_SRCS} context_qt.cpp )
-   target_link_libraries( gpgmepp-qt LINK_PRIVATE ${GPGME_QT_LIBRARIES} )
-   if(WIN32)
-      target_link_libraries( gpgmepp-qt LINK_PRIVATE ${GPGME_VANILLA_LIBRARIES} )
-   endif()
-   set_target_properties( gpgmepp-qt PROPERTIES
-                                     VERSION     ${_gpgmepp_version}
-                                     SOVERSION   ${_gpgmepp_soversion}
-                                     OUTPUT_NAME gpgme++-qt DEFINE_SYMBOL gpgmepp_EXPORTS
-   )
-   set(GPGMEPP_QT_LIBRARY ${LIBRARY_OUTPUT_PATH}/libgpgmepp.so)
-   install(TARGETS gpgmepp-qt EXPORT kdepimlibsLibraryTargets ${INSTALL_TARGETS_DEFAULT_ARGS} )
-endif()
-
-
-if ( GPGME_PTHREAD_FOUND )
-   add_library( gpgmepp-pthread ${LIBRARY_TYPE} ${gpgme_LIB_SRCS} context_vanilla.cpp )
-   target_link_libraries( gpgmepp-pthread LINK_PRIVATE ${GPGME_PTHREAD_LIBRARIES} )
-   set_target_properties( gpgmepp-pthread PROPERTIES
-                                          VERSION     ${_gpgmepp_version}
-                                          SOVERSION   ${_gpgmepp_soversion}
-                                          OUTPUT_NAME gpgme++-pthread DEFINE_SYMBOL gpgmepp_EXPORTS
-   )
-   set(GPGMEPP_PTHREAD_LIBRARY ${LIBRARY_OUTPUT_PATH}/libgpgmepp.so)
-   install(TARGETS gpgmepp-pthread EXPORT kdepimlibsLibraryTargets ${INSTALL_TARGETS_DEFAULT_ARGS} )
-endif()
-
-if ( GPGME_PTH_FOUND )
-   add_library( gpgmepp-pth ${LIBRARY_TYPE} ${gpgme_LIB_SRCS} context_vanilla.cpp )
-   target_link_libraries( gpgmepp-pth LINK_PRIVATE ${GPGME_PTH_LIBRARIES} )
-   set_target_properties( gpgmepp-pth PROPERTIES
-                                      VERSION     ${_gpgmepp_version}
-                                      SOVERSION   ${_gpgmepp_soversion}
-                                      OUTPUT_NAME gpgme++-pth DEFINE_SYMBOL gpgmepp_EXPORTS
-   )
-   set(GPGMEPP_PTH_LIBRARY ${LIBRARY_OUTPUT_PATH}/libgpgmepp.so)
-   install(TARGETS gpgmepp-pth EXPORT kdepimlibsLibraryTargets ${INSTALL_TARGETS_DEFAULT_ARGS} )
 endif()
 
 

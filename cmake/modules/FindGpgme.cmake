@@ -2,23 +2,18 @@
 #
 # Algorithm:
 #  - Windows:
-#    On Windows, there's three gpgme variants: gpgme{,-glib,-qt}.
+#    On Windows, there are two gpgme variants: gpgme{,-glib}.
 #    - The variant used determines the event loop integration possible:
 #      - gpgme:      no event loop integration possible, only synchronous operations supported
 #      - gpgme-glib: glib event loop integration possible, only asynchronous operations supported
-#      - gpgme-qt:   qt event loop integration possible, only asynchronous operations supported
-#    - GPGME_{VANILLA,GLIB,QT}_{FOUND,LIBRARIES} will be set for each of the above
+#    - GPGME_{VANILLA,GLIB}_{FOUND,LIBRARIES} will be set for each of the above
 #    - GPGME_INCLUDES is the same for all of the above
 #    - GPGME_FOUND is set if any of the above was found
 #  - *nix:
-#    There's also three variants: gpgme{,-pthread,-pth}.
-#    - The variant used determines the multithreaded use possible:
-#      - gpgme:         no multithreading support available
-#      - gpgme-pthread: multithreading available using POSIX threads
-#      - gpgme-pth:     multithreading available using GNU PTH (cooperative multithreading)
-#    - GPGME_{VANILLA,PTH,PTHREAD}_{FOUND,LIBRARIES} will be set for each of the above
-#    - GPGME_INCLUDES is the same for all of the above
-#    - GPGME_FOUND is set if any of the above was found
+#    There is one variant: gpgme.
+#    - GPGME_VANILLA_{FOUND,LIBRARIES}
+#    - GPGME_INCLUDES
+#    - GPGME_FOUND is set if gpgme was found
 #
 #  GPGME_LIBRARY_DIR - the directory where the libraries are located
 
@@ -54,7 +49,7 @@ if ( WIN32 )
   # don't require 2.6.3 but 2.6.2, we can't use it. Alex
   set( _seem_to_have_cached_gpgme false )
   if ( GPGME_INCLUDES )
-    if ( GPGME_VANILLA_LIBRARIES OR GPGME_QT_LIBRARIES OR GPGME_GLIB_LIBRARIES )
+    if ( GPGME_VANILLA_LIBRARIES OR GPGME_GLIB_LIBRARIES )
       set( _seem_to_have_cached_gpgme true )
     endif()
   endif()
@@ -63,11 +58,10 @@ if ( WIN32 )
 
     macro_bool_to_bool( GPGME_VANILLA_LIBRARIES  GPGME_VANILLA_FOUND )
     macro_bool_to_bool( GPGME_GLIB_LIBRARIES     GPGME_GLIB_FOUND    )
-    macro_bool_to_bool( GPGME_QT_LIBRARIES       GPGME_QT_FOUND      )
     # this would have been preferred:
     #set( GPGME_*_FOUND macro_bool_to_bool(GPGME_*_LIBRARIES) )
 
-    if ( GPGME_VANILLA_FOUND OR GPGME_GLIB_FOUND OR GPGME_QT_FOUND )
+    if ( GPGME_VANILLA_FOUND OR GPGME_GLIB_FOUND )
       set( GPGME_FOUND true )
     else()
       set( GPGME_FOUND false )
@@ -84,7 +78,6 @@ if ( WIN32 )
     set( GPGME_FOUND         false )
     set( GPGME_VANILLA_FOUND false )
     set( GPGME_GLIB_FOUND    false )
-    set( GPGME_QT_FOUND      false )
 
     find_path( GPGME_INCLUDES gpgme.h
       ${CMAKE_INCLUDE_PATH}
@@ -98,12 +91,6 @@ if ( WIN32 )
     )
 
     find_library( _gpgme_glib_library    NAMES gpgme-glib libgpgme-glib gpgme-glib-11 libgpgme-glib-11
-      PATHS 
-        ${CMAKE_LIBRARY_PATH}
-        ${CMAKE_INSTALL_PREFIX}/lib
-    )
-
-    find_library( _gpgme_qt_library      NAMES gpgme-qt libgpgme-qt gpgme-qt-11 libgpgme-qt-11
       PATHS 
         ${CMAKE_LIBRARY_PATH}
         ${CMAKE_INSTALL_PREFIX}/lib
@@ -129,24 +116,11 @@ if ( WIN32 )
       set( GPGME_FOUND             true )
     endif()
 
-    if ( _gpgme_qt_library AND _gpg_error_library )
-      set( GPGME_QT_LIBRARIES      ${_gpgme_qt_library}      ${_gpg_error_library} )
-      set( GPGME_QT_FOUND          true )
-      set( GPGME_FOUND             true )
-    endif()
-
   endif()
-
-  # these are Unix-only:
-  set( GPGME_PTHREAD_FOUND false )
-  set( GPGME_PTH_FOUND     false )
-  set( HAVE_GPGME_PTHREAD  0     )
-  set( HAVE_GPGME_PTH      0     )
 
   macro_bool_to_01( GPGME_FOUND         HAVE_GPGME         )
   macro_bool_to_01( GPGME_VANILLA_FOUND HAVE_GPGME_VANILLA )
   macro_bool_to_01( GPGME_GLIB_FOUND    HAVE_GPGME_GLIB    )
-  macro_bool_to_01( GPGME_QT_FOUND      HAVE_GPGME_QT      )
 
 else() # not WIN32
 
@@ -156,7 +130,7 @@ else() # not WIN32
   # see WIN32 case for an explanation of what this does:
   set( _seem_to_have_cached_gpgme false )
   if ( GPGME_INCLUDES )
-    if ( GPGME_VANILLA_LIBRARIES OR GPGME_PTHREAD_LIBRARIES OR GPGME_PTH_LIBRARIES )
+    if ( GPGME_VANILLA_LIBRARIES )
       set( _seem_to_have_cached_gpgme true )
     endif()
   endif()
@@ -164,10 +138,8 @@ else() # not WIN32
   if ( _seem_to_have_cached_gpgme )
 
     macro_bool_to_bool( GPGME_VANILLA_LIBRARIES GPGME_VANILLA_FOUND )
-    macro_bool_to_bool( GPGME_PTHREAD_LIBRARIES GPGME_PTHREAD_FOUND )
-    macro_bool_to_bool( GPGME_PTH_LIBRARIES     GPGME_PTH_FOUND     )
 
-    if ( GPGME_VANILLA_FOUND OR GPGME_PTHREAD_FOUND OR GPGME_PTH_FOUND )
+    if ( GPGME_VANILLA_FOUND )
       set( GPGME_FOUND true )
     else()
       set( GPGME_FOUND false )
@@ -177,8 +149,6 @@ else() # not WIN32
 
     set( GPGME_FOUND         false )
     set( GPGME_VANILLA_FOUND false )
-    set( GPGME_PTHREAD_FOUND false )
-    set( GPGME_PTH_FOUND     false )
 
     find_program( _GPGMECONFIG_EXECUTABLE NAMES gpgme-config )
 
@@ -189,8 +159,8 @@ else() # not WIN32
 
       exec_program( ${_GPGMECONFIG_EXECUTABLE} ARGS --version OUTPUT_VARIABLE GPGME_VERSION )
 
-      set( _GPGME_MIN_VERSION "1.1.7" )
-      if( ${GPGME_VERSION} VERSION_GREATER ${_GPGME_MIN_VERSION} )
+      set( _GPGME_MIN_VERSION "1.8.0" )
+      if( NOT ${GPGME_VERSION} VERSION_LESS ${_GPGME_MIN_VERSION} )
         set( _GPGME_INSTALLED_VERSION_OK TRUE )
       endif()
 
@@ -207,24 +177,14 @@ else() # not WIN32
 	  set( _gpgme_config_vanilla_libs )
 	endif()
 
-        exec_program( ${_GPGMECONFIG_EXECUTABLE} ARGS --thread=pthread --libs OUTPUT_VARIABLE _gpgme_config_pthread_libs RETURN_VALUE _ret )
-	if ( _ret )
-	  set( _gpgme_config_pthread_libs )
-	endif()
-
-        exec_program( ${_GPGMECONFIG_EXECUTABLE} ARGS --thread=pth     --libs OUTPUT_VARIABLE _gpgme_config_pth_libs     RETURN_VALUE _ret )
-	if ( _ret )
-	  set( _gpgme_config_pth_libs )
-	endif()
-
         # append -lgpg-error to the list of libraries, if necessary
-        foreach ( _flavour vanilla pthread pth )
+        foreach ( _flavour vanilla )
           if ( _gpgme_config_${_flavour}_libs AND NOT _gpgme_config_${_flavour}_libs MATCHES "lgpg-error" )
             set( _gpgme_config_${_flavour}_libs "${_gpgme_config_${_flavour}_libs} -lgpg-error" )
           endif()
         endforeach()
 
-        if ( _gpgme_config_vanilla_libs OR _gpgme_config_pthread_libs OR _gpgme_config_pth_libs )
+        if ( _gpgme_config_vanilla_libs )
 
           exec_program( ${_GPGMECONFIG_EXECUTABLE} ARGS --cflags OUTPUT_VARIABLE _GPGME_CFLAGS )
 
@@ -233,7 +193,7 @@ else() # not WIN32
             string( REGEX REPLACE " *-I"      ";" GPGME_INCLUDES "${_GPGME_CFLAGS}" )
           endif()
 
-          foreach ( _flavour vanilla pthread pth )
+          foreach ( _flavour vanilla )
             if ( _gpgme_config_${_flavour}_libs )
 
               set( _gpgme_library_dirs )
@@ -291,13 +251,11 @@ else() # not WIN32
           endforeach( _flavour )
 
           # ensure that they are cached
-          # This comment above doesn't make sense, the four following lines seem to do nothing. Alex
+          # This comment above doesn't make sense, the two following lines seem to do nothing. Alex
           set( GPGME_INCLUDES          ${GPGME_INCLUDES} )
           set( GPGME_VANILLA_LIBRARIES ${GPGME_VANILLA_LIBRARIES} )
-          set( GPGME_PTHREAD_LIBRARIES ${GPGME_PTHREAD_LIBRARIES} )
-          set( GPGME_PTH_LIBRARIES     ${GPGME_PTH_LIBRARIES} )
 
-          if ( GPGME_VANILLA_FOUND OR GPGME_PTHREAD_FOUND OR GPGME_PTH_FOUND )
+          if ( GPGME_VANILLA_FOUND )
             set( GPGME_FOUND true )
           else()
             set( GPGME_FOUND false )
@@ -313,14 +271,10 @@ else() # not WIN32
 
   # these are Windows-only:
   set( GPGME_GLIB_FOUND false )
-  set( GPGME_QT_FOUND   false )
   set( HAVE_GPGME_GLIB  0     )
-  set( HAVE_GPGME_QT    0     )
 
   macro_bool_to_01( GPGME_FOUND         HAVE_GPGME         )
   macro_bool_to_01( GPGME_VANILLA_FOUND HAVE_GPGME_VANILLA )
-  macro_bool_to_01( GPGME_PTHREAD_FOUND HAVE_GPGME_PTHREAD )
-  macro_bool_to_01( GPGME_PTH_FOUND     HAVE_GPGME_PTH     )
 
 endif() # WIN32 | Unix
 
@@ -335,20 +289,8 @@ if ( GPGME_GLIB_FOUND )
   set( _gpgme_flavours "${_gpgme_flavours} Glib" )
 endif()
 
-if ( GPGME_QT_FOUND )
-  set( _gpgme_flavours "${_gpgme_flavours} Qt" )
-endif()
-
-if ( GPGME_PTHREAD_FOUND )
-  set( _gpgme_flavours "${_gpgme_flavours} pthread" )
-endif()
-
-if ( GPGME_PTH_FOUND )
-  set( _gpgme_flavours "${_gpgme_flavours} pth" )
-endif()
-
 # determine the library in one of the found flavours, can be reused e.g. by FindQgpgme.cmake, Alex
-foreach(_currentFlavour vanilla glib qt pth pthread)
+foreach(_currentFlavour vanilla glib)
    if(NOT GPGME_LIBRARY_DIR)
       get_filename_component(GPGME_LIBRARY_DIR "${_gpgme_${_currentFlavour}_lib}" PATH)
    endif()

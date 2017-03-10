@@ -12,13 +12,8 @@ find_package(Gpgme QUIET)
 
 if(GPGME_FOUND)
 
-   if ( WIN32 )
-      find_library(_QGPGME_EXTRA_LIBRARY gpgme++
-                   HINTS ${GPGME_LIBRARY_DIR})
-   else ( WIN32 )
-      find_library(_QGPGME_EXTRA_LIBRARY gpgme++-pthread
-                   HINTS ${GPGME_LIBRARY_DIR})
-   endif()
+   find_library(_QGPGME_EXTRA_LIBRARY gpgme++
+                HINTS ${GPGME_LIBRARY_DIR})
 
    find_library(QGPGME_LIBRARY qgpgme
                 HINTS ${GPGME_LIBRARY_DIR})
@@ -31,11 +26,7 @@ if(GPGME_FOUND)
                 HINTS "${_QGPGME_PREFIX}/include" )
    endif()
 
-   if ( WIN32 )
-      set(QGPGME_LIBRARIES ${QGPGME_LIBRARY} ${_QGPGME_EXTRA_LIBRARY} ${GPGME_VANILLA_LIBRARIES} ${GPGME_QT_LIBRARIES})
-   else ( WIN32 )
-      set(QGPGME_LIBRARIES ${QGPGME_LIBRARY} ${_QGPGME_EXTRA_LIBRARY} ${GPGME_PTHREAD_LIBRARIES})
-   endif()
+   set(QGPGME_LIBRARIES ${QGPGME_LIBRARY} ${_QGPGME_EXTRA_LIBRARY} ${GPGME_VANILLA_LIBRARIES})
 
 endif()
 
