@@ -75,7 +75,7 @@ set_package_properties(Boost PROPERTIES DESCRIPTION "Boost C++ Libraries" URL "h
 find_package(Gpgme REQUIRED)
 # configure macros
 if (GPGME_FOUND)
-  include (gpgme++/ConfigureChecks.cmake)
+  include (kde4_gpgme++/ConfigureChecks.cmake)
 endif()
 
 if (NOT KDEPIM_ONLY_KLEO)
@@ -140,8 +140,8 @@ endif()
 ############### Now, we add the KDEPIMLibs components ###############
 # These targets will always be built
 add_subdirectory(cmake)
-add_subdirectory(gpgme++)
-add_subdirectory(qgpgme)
+add_subdirectory(kde4_gpgme++)
+add_subdirectory(kde4_qgpgme)
 
 if (NOT KDEPIM_ONLY_KLEO)
   add_subdirectory(kabc)
