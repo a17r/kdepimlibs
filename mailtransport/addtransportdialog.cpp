@@ -27,8 +27,10 @@
 #include <KDebug>
 #include <KGlobal>
 
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
 #include <akonadi/agentinstance.h>
 #include <akonadi/agentinstancecreatejob.h>
+#endif
 
 using namespace MailTransport;
 
@@ -156,6 +158,7 @@ void AddTransportDialog::accept()
   // Create a new transport and configure it.
   Transport *transport = TransportManager::self()->createTransport();
   transport->setTransportType( d->selectedType() );
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
   if ( d->selectedType().type() == Transport::EnumType::Akonadi ) {
     // Create a resource instance if Akonadi-type transport.
     using namespace Akonadi;
@@ -167,6 +170,7 @@ void AddTransportDialog::accept()
     }
     transport->setHost( cjob->instance().identifier() );
   }
+#endif
   transport->setName( d->ui.name->text().trimmed() );
   transport->forceUniqueName();
   if ( TransportManager::self()->configureTransport( transport, this ) ) {

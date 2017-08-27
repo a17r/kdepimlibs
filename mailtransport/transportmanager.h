@@ -26,7 +26,9 @@
 #include <QtCore/QList>
 #include <QtCore/QObject>
 
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
 #include <akonadi/agenttype.h>
+#endif
 
 class KJob;
 
@@ -293,8 +295,10 @@ class MAILTRANSPORT_EXPORT TransportManager : public QObject
     Q_PRIVATE_SLOT( d, void slotTransportsChanged() )
     Q_PRIVATE_SLOT( d, void slotWalletOpened( bool success ) )
     Q_PRIVATE_SLOT( d, void dbusServiceUnregistered() )
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
     Q_PRIVATE_SLOT( d, void agentTypeAdded( const Akonadi::AgentType &atype ) )
     Q_PRIVATE_SLOT( d, void agentTypeRemoved( const Akonadi::AgentType &atype ) )
+#endif
     Q_PRIVATE_SLOT( d, void jobResult( KJob *job ) )
 };
 

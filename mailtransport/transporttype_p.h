@@ -23,7 +23,9 @@
 #include <QtCore/QSharedData>
 #include <QtCore/QString>
 
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
 #include <akonadi/agenttype.h>
+#endif
 
 namespace MailTransport {
 
@@ -44,13 +46,17 @@ class TransportType::Private : public QSharedData
       mType = other.mType;
       mName = other.mName;
       mDescription = other.mDescription;
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
       mAgentType = other.mAgentType;
+#endif
     }
 
     int mType;
     QString mName;
     QString mDescription;
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
     Akonadi::AgentType mAgentType;
+#endif
 };
 
 } // namespace MailTransport
