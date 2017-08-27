@@ -122,7 +122,7 @@ set_target_properties(mailtransport PROPERTIES
 )
 
 install(TARGETS mailtransport EXPORT kdepimlibsLibraryTargets ${INSTALL_TARGETS_DEFAULT_ARGS})
-install(FILES mailtransport.kcfg DESTINATION ${KCFG_INSTALL_DIR})
+install(FILES mailtransport.kcfg DESTINATION ${KCFG_INSTALL_DIR} RENAME mailtransport4.kcfg)
 
 set(mailtransport_kcm_srcs configmodule.cpp)
 kde4_add_plugin(kcm_mailtransport ${mailtransport_kcm_srcs})
