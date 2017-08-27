@@ -21,7 +21,9 @@
 #include "transporttype_p.h"
 #include "transport.h"
 
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
 #include <akonadi/agentmanager.h>
+#endif
 
 using namespace MailTransport;
 
@@ -49,20 +51,28 @@ TransportType &TransportType::operator=( const TransportType &other )
 
 bool TransportType::operator==( const TransportType &other ) const
 {
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
   if ( d->mType == Transport::EnumType::Akonadi &&
        other.d->mType == Transport::EnumType::Akonadi ) {
     return ( d->mAgentType == other.d->mAgentType );
   }
+#endif
   return ( d->mType == other.d->mType );
 }
 
 bool TransportType::isValid() const
 {
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
   using namespace Akonadi;
+#endif
 
   if ( d->mType == Transport::EnumType::Akonadi ) {
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
     return d->mAgentType.isValid() &&
       AgentManager::self()->types().contains( d->mAgentType );
+#else
+    return false;
+#endif
   } else {
     return d->mType >= 0;
   }
@@ -83,8 +93,10 @@ QString TransportType::description() const
   return d->mDescription;
 }
 
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
 Akonadi::AgentType TransportType::agentType() const
 {
   Q_ASSERT( d->mType == Transport::EnumType::Akonadi );
   return d->mAgentType;
 }
+#endif

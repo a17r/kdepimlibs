@@ -47,6 +47,8 @@ set(tm_srcs transportmgr.cpp)
 kde4_add_executable(transportmgr TEST ${tm_srcs})
 target_link_libraries(transportmgr ${KDE4_KDEUI_LIBS} mailtransport)
 
+if (NOT KDEPIM_NO_AKONADI)
+
 set(queuer_srcs queuer.cpp)
 kde4_add_executable(queuer TEST ${queuer_srcs})
 target_link_libraries(queuer ${KDE4_KDEUI_LIBS} mailtransport kmime akonadi-kde akonadi-kmime)
@@ -71,3 +73,5 @@ add_akonadi_isolated_test( filteractiontest.cpp unittestenv_akonadi )
 if (KDEPIMLIBS_RUN_KDEPIMRUNTIME_ISOLATED_TESTS)
     add_akonadi_isolated_test( messagequeuejobtest.cpp unittestenv )
 endif ()
+
+endif()

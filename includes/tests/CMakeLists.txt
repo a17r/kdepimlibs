@@ -29,6 +29,7 @@ macro(add_includes _dir)
 endmacro()
 
 include_directories(
+  if (NOT KDEPIM_NO_AKONADI)
   # HACK: akonadi/calendar has a generated header. We need to go up 3 directories level
   ${CMAKE_BINARY_DIR}/akonadi/calendar/tests
   ${CMAKE_BINARY_DIR}/akonadi
@@ -39,6 +40,7 @@ include_directories(
   ${CMAKE_BINARY_DIR}/akonadi/kmime
   ${CMAKE_BINARY_DIR}/akonadi/notes
   ${CMAKE_BINARY_DIR}/akonadi/socialutils
+  endif()
   ${CMAKE_BINARY_DIR}/kabc
   ${CMAKE_BINARY_DIR}/kalarmcal
   ${CMAKE_BINARY_DIR}/kcal
@@ -61,7 +63,9 @@ include_directories(
   ${Boost_INCLUDE_DIR}
 )
 
+if (NOT KDEPIM_NO_AKONADI)
 add_includes( Akonadi )
+endif()
 add_includes( KABC )
 add_includes( KAlarmCal )
 add_includes( KCalCore )
@@ -86,12 +90,15 @@ add_includes( Mailtransport )
 add_includes( Syndication )
 
 add_definitions( -DQT_NO_CAST_FROM_ASCII -DQT_NO_CAST_TO_ASCII -DQT_NO_KEYWORDS -DQT_NO_CAST_FROM_BYTEARRAY -DQT_STRICT_ITERATORS )
+
+if (NOT KDEPIM_NO_AKONADI)
 kde4_add_executable( headercompiletest header_compile.cpp )
 target_link_libraries( headercompiletest ${QT_QTCORE_LIBRARY} )
 add_dependencies( headercompiletest akonadi-calendar ) # ensure calendarsettings.h is generated in parallel builds
 add_dependencies( headercompiletest kabc ) # ensure addressee.h is generated in parallel builds
 add_dependencies( headercompiletest kcal )
 add_dependencies( headercompiletest mailtransport ) # ensure transportbase.h is generated in parallel builds
+endif()
 
 endif()
 

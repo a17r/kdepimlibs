@@ -25,7 +25,9 @@
 
 #include <QtCore/QString>
 
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
 #include <akonadi/agenttype.h>
+#endif
 
 namespace MailTransport {
 
@@ -107,11 +109,13 @@ class MAILTRANSPORT_EXPORT TransportType
     */
     QString description() const;
 
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
     /**
       Returns the corresponding Akonadi::AgentType that this transport type
       represents.  Only valid if type() is Transport::EnumType::Akonadi.
     */
     Akonadi::AgentType agentType() const;
+#endif
 
   private:
     //@cond PRIVATE
