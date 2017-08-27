@@ -33,8 +33,10 @@
 #include <KStringHandler>
 #include <KWallet/Wallet>
 
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
 #include <akonadi/agentinstance.h>
 #include <akonadi/agentmanager.h>
+#endif
 
 using namespace MailTransport;
 using namespace KWallet;
@@ -162,10 +164,13 @@ void Transport::usrReadConfig()
 
   // Set TransportType.
   {
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
     using namespace Akonadi;
+#endif
     d->transportType = TransportType();
     d->transportType.d->mType = type();
     kDebug() << "type" << type();
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
     if ( type() == EnumType::Akonadi ) {
       const AgentInstance instance = AgentManager::self()->instance( host() );
       if ( !instance.isValid() ) {
@@ -174,6 +179,7 @@ void Transport::usrReadConfig()
       d->transportType.d->mAgentType = instance.type();
       kDebug() << "agent type" << instance.type().name() << "id" << instance.type().identifier();
     }
+#endif
     // Now we have the type and possibly agentType.  Get the name, description
     // etc. from TransportManager.
     const TransportType::List &types = TransportManager::self()->types();

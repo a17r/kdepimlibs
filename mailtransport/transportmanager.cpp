@@ -18,7 +18,9 @@
 */
 
 #include "transportmanager.h"
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
 #include "resourcesendjob_p.h"
+#endif
 #include "mailtransport_defs.h"
 #include "sendmailjob.h"
 #include "smtpjob.h"
@@ -52,8 +54,10 @@
 #include <KGlobal>
 #include <KWallet/Wallet>
 
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
 #include <akonadi/agentinstance.h>
 #include <akonadi/agentmanager.h>
+#endif
 
 using namespace MailTransport;
 using namespace KWallet;
@@ -101,8 +105,10 @@ class TransportManagerPrivate
     void slotTransportsChanged();
     void slotWalletOpened( bool success );
     void dbusServiceUnregistered();
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
     void agentTypeAdded( const Akonadi::AgentType &atype );
     void agentTypeRemoved( const Akonadi::AgentType &atype );
+#endif
     void jobResult( KJob *job );
 };
 
@@ -124,7 +130,9 @@ TransportManager::TransportManager()
   : QObject(), d( new TransportManagerPrivate( this ) )
 {
   KGlobal::locale()->insertCatalog( QLatin1String( "libmailtransport" ) );
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
   KGlobal::locale()->insertCatalog( QLatin1String( "libakonadi-kmime" ) );
+#endif
   qAddPostRoutine( destroyStaticTransportManager );
   d->myOwnChange = false;
   d->appliedChange = false;
@@ -281,6 +289,7 @@ bool TransportManager::showTransportCreationDialog( QWidget *parent,
 
 bool TransportManager::configureTransport( Transport *transport, QWidget *parent )
 {
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
   if ( transport->type() == Transport::EnumType::Akonadi ) {
     using namespace Akonadi;
     AgentInstance instance = AgentManager::self()->instance( transport->host() );
@@ -291,6 +300,7 @@ bool TransportManager::configureTransport( Transport *transport, QWidget *parent
     transport->writeConfig();
     return true; // No way to know here if the user cancelled or not.
   }
+#endif
 
   QPointer<TransportConfigDialog> transportConfigDialog =
     new TransportConfigDialog( transport, parent );
@@ -313,8 +323,10 @@ TransportJob *TransportManager::createTransportJob( int transportId )
     return new SmtpJob( t, this );
   case Transport::EnumType::Sendmail:
     return new SendmailJob( t, this );
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
   case Transport::EnumType::Akonadi:
     return new ResourceSendJob( t, this );
+#endif
   }
   Q_ASSERT( false );
   return 0;
@@ -395,6 +407,7 @@ void TransportManager::removeTransport( int id )
   }
   emit transportRemoved( t->id(), t->name() );
 
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
   // Kill the resource, if Akonadi-type transport.
   if ( t->type() == Transport::EnumType::Akonadi ) {
     using namespace Akonadi;
@@ -404,6 +417,7 @@ void TransportManager::removeTransport( int id )
     }
     AgentManager::self()->removeInstance( instance );
   }
+#endif
 
   d->transports.removeAll( t );
   d->validateDefault();
@@ -506,6 +520,7 @@ void TransportManagerPrivate::fillTypes()
     types << type;
   }
 
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
   // All Akonadi resources with MailTransport capability.
   {
     using namespace Akonadi;
@@ -529,6 +544,7 @@ void TransportManagerPrivate::fillTypes()
     QObject::connect( AgentManager::self(), SIGNAL(typeRemoved(Akonadi::AgentType)),
         q, SLOT(agentTypeRemoved(Akonadi::AgentType)) );
   }
+#endif
 
   kDebug() << "Have SMTP, Sendmail, and" << types.count() - 2 << "Akonadi types.";
 }
@@ -748,6 +764,7 @@ void TransportManagerPrivate::dbusServiceUnregistered()
   QDBusConnection::sessionBus().registerService( DBUS_SERVICE_NAME );
 }
 
+#ifdef MAILTRANSPORT_AKONADI_SUPPORT
 void TransportManagerPrivate::agentTypeAdded( const Akonadi::AgentType &atype )
 {
   using namespace Akonadi;
@@ -773,6 +790,7 @@ void TransportManagerPrivate::agentTypeRemoved( const Akonadi::AgentType &atype 
     }
   }
 }
+#endif
 
 void TransportManagerPrivate::jobResult( KJob *job )
 {

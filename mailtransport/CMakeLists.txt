@@ -2,10 +2,15 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${KDE4_ENABLE_EXCEPTIONS}")
 
 include_directories(
   ${Boost_INCLUDE_DIR}
-  ${CMAKE_BINARY_DIR}/akonadi
-  ${CMAKE_BINARY_DIR}/akonadi/kmime
   ${CMAKE_BINARY_DIR}/kmime
 )
+
+if (NOT KDEPIM_NO_AKONADI)
+include_directories(
+  ${CMAKE_BINARY_DIR}/akonadi
+  ${CMAKE_BINARY_DIR}/akonadi/kmime
+)
+endif()
 
 option(MAILTRANSPORT_INPROCESS_SMTP "false" "Use in-process SMTP instead of KIO slaves (note that this changes the mailtransport license from LGPL to GPL!)")
 
@@ -22,6 +27,10 @@ add_definitions(
 add_definitions(
   -DMAILTRANSPORT_DEPRECATED_EXPORT=MAILTRANSPORT_EXPORT
 )
+
+if (NOT KDEPIM_NO_AKONADI)
+  add_definitions("-DMAILTRANSPORT_AKONADI_SUPPORT")
+endif()
 
 if(MAILTRANSPORT_INPROCESS_SMTP)
   add_definitions("-DMAILTRANSPORT_INPROCESS_SMTP")
@@ -46,9 +55,7 @@ set(mailtransport_lib_srcs
   transportcombobox.cpp
   transportconfigwidget.cpp
 
-  filteractionjob.cpp
   transportjob.cpp
-  resourcesendjob.cpp
   sendmailjob.cpp
   smtpjob.cpp
   precommandjob.cpp
@@ -56,6 +63,22 @@ set(mailtransport_lib_srcs
   legacydecrypt.cpp
   socket.cpp
   servertest.cpp
+
+  transportconfigdialog.cpp
+  sendmailconfigwidget.cpp
+  smtpconfigwidget.cpp
+
+  transportlistview.cpp
+  transportmanagementwidget.cpp
+  addtransportdialog.cpp
+)
+
+if (NOT KDEPIM_NO_AKONADI)
+set(mailtransport_lib_srcs
+  ${mailtransport_lib_srcs}
+
+  filteractionjob.cpp
+  resourcesendjob.cpp
 
   dispatcherinterface.cpp
   messagequeuejob.cpp
@@ -67,14 +90,8 @@ set(mailtransport_lib_srcs
   sentactionattribute.cpp
   sentbehaviourattribute.cpp
   transportattribute.cpp
-  transportconfigdialog.cpp
-  sendmailconfigwidget.cpp
-  smtpconfigwidget.cpp
-
-  transportlistview.cpp
-  transportmanagementwidget.cpp
-  addtransportdialog.cpp
 )
+endif()
 
 kde4_add_ui_files(mailtransport_lib_srcs
   sendmailsettings.ui
@@ -91,7 +108,10 @@ kde4_add_kcfg_files(mailtransport_lib_srcs transportbase.kcfgc)
 
 add_library(mailtransport ${LIBRARY_TYPE} ${mailtransport_lib_srcs})
 generate_export_header(mailtransport)
-target_link_libraries(mailtransport LINK_PRIVATE ${KDE4_KIO_LIBS} akonadi-kde akonadi-kmime kmime)
+target_link_libraries(mailtransport LINK_PRIVATE ${KDE4_KIO_LIBS})
+if (NOT KDEPIM_NO_AKONADI)
+target_link_libraries(mailtransport LINK_PRIVATE akonadi-kde akonadi-kmime kmime)
+endif()
 if(MAILTRANSPORT_INPROCESS_SMTP)
   target_link_libraries(mailtransport LINK_PRIVATE ${SASL2_LIBRARIES} kpimutils)
 endif()
@@ -130,6 +150,11 @@ install(FILES
   transportconfigdialog.h
   transportmanagementwidget.h
 
+  DESTINATION ${INCLUDE_INSTALL_DIR}/mailtransport COMPONENT Devel
+)
+
+if (NOT KDEPIM_NO_AKONADI)
+install(FILES
   dispatcherinterface.h
   messagequeuejob.h
 
@@ -141,4 +166,4 @@ install(FILES
 
   DESTINATION ${INCLUDE_INSTALL_DIR}/mailtransport COMPONENT Devel
 )
-
+endif()
