@@ -2138,7 +2138,7 @@ void KAEventPrivate::setCommandError(KAEvent::CmdErrType error, bool writeConfig
                 case KAEvent::CMD_ERROR_PRE:   errtext = CMD_ERROR_PRE_VALUE;  break;
                 case KAEvent::CMD_ERROR_POST:  errtext = CMD_ERROR_POST_VALUE;  break;
                 case KAEvent::CMD_ERROR_PRE_POST:
-                    errtext = CMD_ERROR_PRE_VALUE + ',' + CMD_ERROR_POST_VALUE;
+                    errtext = CMD_ERROR_PRE_VALUE + QLatin1Char(',') + CMD_ERROR_POST_VALUE;
                     break;
                 default:
                     break;
@@ -2160,7 +2160,7 @@ void KAEvent::setCommandError(const QString& configString)
 void KAEventPrivate::setCommandError(const QString& configString)
 {
     mCommandError = KAEvent::CMD_NO_ERROR;
-    const QStringList errs = configString.split(',');
+    const QStringList errs = configString.split( QLatin1Char(',') );
     if (errs.indexOf(CMD_ERROR_VALUE) >= 0)
         mCommandError = KAEvent::CMD_ERROR;
     else
